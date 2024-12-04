@@ -1,0 +1,56 @@
+version: '2'
+
+volumes:
+  db:
+  db2:
+
+services:
+  db:
+    image: mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW --character-set-server=utf8 --collation-server=utf8_general_ci
+    volumes:
+      - db:/var/lib/mysql
+      - ../db-bootstrap/monarc_structure.sql:/docker-entrypoint-initdb.d/1_monarc_structure.sql:ro
+      - ../db-bootstrap/monarc_data.sql:/docker-entrypoint-initdb.d/2_monarc_data.sql:ro      
+    environment:
+      - MYSQL_ROOT_PASSWORD=a
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=monarc_common
+      - MYSQL_USER=monarc
+    ports:
+      - 3306:3306
+
+  db2:
+    image: mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW --character-set-server=utf8 --collation-server=utf8_general_ci
+    volumes:
+      - db2:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=a
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=monarc_cli
+      - MYSQL_USER=monarc
+
+  app:
+    #image: monarc
+    build: .
+    restart: always
+    ports:
+      - 8080:80
+    links:
+      - db
+      - db2
+    environment:
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=monarc_common
+      - MYSQL_USER=monarc
+      - MYSQL_HOST=db
+      - MYSQL_PASSWORD2=password
+      - MYSQL_DATABASE2=monarc_cli
+      - MYSQL_USER2=monarc
+      - MYSQL_HOST2=db2
+    depends_on:
+      - db
+      - db2      
