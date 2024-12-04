@@ -18,8 +18,6 @@ services:
       - MYSQL_PASSWORD=password
       - MYSQL_DATABASE=monarc_common
       - MYSQL_USER=monarc
-    ports:
-      - 3306:3306
 
   db2:
     image: mariadb

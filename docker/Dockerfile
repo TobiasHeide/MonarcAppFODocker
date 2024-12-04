@@ -51,10 +51,10 @@ RUN { \
     } > "${PHP_INI_DIR}/conf.d/monarc.ini";
 
 # 
-COPY docker/init.sh /init.sh
+COPY ./init.sh /init.sh
 RUN chmod +x /init.sh
 
-COPY docker/run.sh /run.sh
+COPY ./run.sh /run.sh
 RUN chmod +x /run.sh
 
 CMD if [ ! -f /tmp/initialized ]; then /init.sh && touch /tmp/initialized; fi && /run.sh
